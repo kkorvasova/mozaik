@@ -234,7 +234,7 @@ def _parameter_combinations_rec(combination,arrays):
     return sum([_parameter_combinations_rec(combination[:] + [value],arrays[1:]) for value in arrays[0]],[])
     
 
-def parameter_search_run_script_distributed_slurm(simulation_name,master_results_dir,run_script,core_number):
+def parameter_search_run_script_distributed_slurm(simulation_name,master_results_dir,run_script,core_number, path_to_mozaik_env):
     """
     Scheadules the execution of *run_script*, one per each parameter combination of an existing parameter search run.
     Each execution receives as the first commandline argument the directory in which the results for the given
@@ -268,7 +268,7 @@ def parameter_search_run_script_distributed_slurm(simulation_name,master_results
                             '#!/bin/bash',
                             '#SBATCH -J MozaikParamSearchAnalysis',
                             '#SBATCH -c ' + str(core_number),
-                            'source ' + str(self.path_to_mozaik_env),
+                            'source ' + str(path_to_mozaik_env),
                             'cd ' + os.getcwd(),
                             'echo "DSADSA"',                            
                             ' '.join(["mpirun"," --mca mtl ^psm python",run_script,"'"+rdn+"'"]  +['>']  + ["'"+rdn +'/OUTFILE_analysis'+str(time.time()) + "'"]),
