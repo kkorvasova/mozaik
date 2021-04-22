@@ -957,7 +957,7 @@ class PopulationActivitySpectrum(Analysis):
             print 'Number of histograms:', len(hists)
 
 
-            spids = param_filter_query(
+            spids = queries.param_filter_query(
                                 self.datastore,
                                 sheet_name=sheet,
                                 ).get_segments()[0].get_stored_spike_train_ids()
