@@ -839,10 +839,14 @@ class SpectrumPlot(Plotting):
 
     sheet_name : str
                From which layer to plot.
+
+    min_freq: float
+              Frequency resolution of pre-calculated PSD.
     """
 
     required_parameters = ParameterSet({
                         'sheet_name': str,
+                        'min_freq': float
     })
 
 
