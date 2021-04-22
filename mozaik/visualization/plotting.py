@@ -847,7 +847,7 @@ class SpectrumPlot(Plotting):
 
 
 
-    def subplot(self, subplotspec)
+    def subplot(self, subplotspec):
         dsv = queries.param_filter_query(self.datastore,
                                         sheet_name=self.parameters.sheet_name)
 
