@@ -986,8 +986,8 @@ class PopulationActivitySpectrum(Analysis):
 
             self.datastore.full_datastore.add_analysis_result(
                         AnalysisDataStructure1D(psds,
-                        x_axis_units=pq.Hz,
-                        y_axis_units=pq*dimensionless,
+                        x_axis_units=qt.Hz,
+                        y_axis_units=qt*dimensionless,
                         x_axis_name='frequency',
                         y_axis_name='psd (min freq={})'.format(self.parameters.min_freq),
                         stimulus_id=self.parameters.stimulus_id,
