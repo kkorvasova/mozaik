@@ -17,6 +17,7 @@ from mozaik.analysis.data_structures import ConductanceSignalList
 from mozaik.analysis.data_structures import SingleValue
 from mozaik.analysis.data_structures import AnalogSignal
 from mozaik.analysis.data_structures import AnalogSignalList
+from mozaik.analysis.data_structures import AnalysisDataStructure1D
 from mozaik.analysis.data_structures import PerNeuronValue
 from mozaik.analysis.data_structures import PerNeuronPairValue
 from mozaik.analysis.data_structures import PerNeuronPairAnalogSignalList
