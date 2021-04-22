@@ -837,12 +837,12 @@ class SpectrumPlot(Plotting):
     Other parameters
     ----------------
 
-    sheet_names : list of str
-               From which layers to plot.
+    sheet_name : str
+               From which layer to plot.
     """
 
     required_parameters = ParameterSet({
-                        'sheet_name': list,
+                        'sheet_name': str,
     })
 
 
