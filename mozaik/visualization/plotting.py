@@ -875,8 +875,8 @@ class SpectrumPlot(Plotting):
                 y_axis_name='psd (min freq={})'.format(self.parameters.min_freq),
                 sheet_name=self.parameters.sheet_name)
 
-        ys = np.mean(np.array(psds), axis=0)
-        xs = np.arnage(0, len(ys), self.parameters.min_freq)
+        ys = numpy.mean(numpy.array(psds), axis=0)
+        xs = numpy.arnage(0, len(ys), self.parameters.min_freq)
 
         params = {  "x_lim" : (0, 150),
                     "x_label": 'frequency (Hz)',
