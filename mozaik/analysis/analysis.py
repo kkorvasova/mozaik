@@ -933,6 +933,9 @@ class PopulationActivitySpectrum(Analysis):
                 Whether to perform z-score before calculating the spectrum.
       stimulus_id: string
                 Type of stimulus (orientation, size...).
+
+      sheet_names: list
+                Sheet namees to be analyzed.
     '''
 
     required_parameters = ParameterSet({
@@ -940,6 +943,7 @@ class PopulationActivitySpectrum(Analysis):
                         'min_freq': float, # frequency resolution (Hz)
                         'zscore': bool, # z-score before psd
                         'stimulus_id': str, # stimulus type
+                        'sheet_names': list
                         })
 
     def perform_analysis(self):
@@ -947,7 +951,7 @@ class PopulationActivitySpectrum(Analysis):
         # bin spikes
         PSTH(self.datastore, ParameterSet({'bin_length': self.parameters.bin_length})).analyse()
 
-        for sheet in self.datastore.sheets():
+        for sheet in self.parameters.sheet_names():
 
             hists =  queries.param_filter_query(self.datastore,
                                       analysis_algorithm='PSTH',
