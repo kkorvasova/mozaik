@@ -846,7 +846,8 @@ class SpectrumPlot(Plotting):
 
     required_parameters = ParameterSet({
                         'sheet_name': str,
-                        'min_freq': float
+                        'min_freq': float,
+
     })
 
 
@@ -859,8 +860,6 @@ class SpectrumPlot(Plotting):
 
     def _ploter(self, dsv,subplotspec):
         offset = 0
-        d = []
-        gs = gridspec.GridSpecFromSubplotSpec(1, 1, subplot_spec=subplotspec)
 
         # params = {}
         # if offset == 1:
@@ -873,20 +872,19 @@ class SpectrumPlot(Plotting):
         psds = queries.param_filter_query(dsv,
                 analysis_algorithm='PopulationActivitySpectrum',
                 y_axis_name='psd (min freq={})'.format(self.parameters.min_freq),
-                sheet_name=self.parameters.sheet_name)
+                sheet_name=self.parameters.sheet_name).get_analysis_result()
+        import ipdb; ipdb.set_trace()
 
-        ys = numpy.mean(numpy.array(psds), axis=0)
-        xs = numpy.arnage(0, len(ys), self.parameters.min_freq)
+        ys = psds[0] #numpy.mean(numpy.array(psds), axis=0)
+        xs = numpy.arange(0, len(ys), self.parameters.min_freq)
 
         params = {  "x_lim" : (0, 150),
                     "x_label": 'frequency (Hz)',
                     "y_label": 'PSD',  # "mean" : True,)
                }
 
-        d.extend([ ("Spectrum_plot",StandardStyleLinePlot(xs, ys), gs,params),
-              ])
-        return d
 
+        return  [("SpectrumPlot",StandardStyleLinePlot(xs, ys), subplotspec,params)]
 
 
 class AnalogSignalListPlot(Plotting):

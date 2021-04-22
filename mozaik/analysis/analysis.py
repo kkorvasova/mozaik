@@ -931,9 +931,6 @@ class PopulationActivitySpectrum(Analysis):
                 Frequency resolution for the power-spectral density.
       zscore: bool
                 Whether to perform z-score before calculating the spectrum.
-      stimulus_id: string
-                Type of stimulus (orientation, size...).
-
       sheet_names: list
                 Sheet namees to be analyzed.
     '''
@@ -942,14 +939,14 @@ class PopulationActivitySpectrum(Analysis):
                         'bin_length': float, # (ms)
                         'min_freq': float, # frequency resolution (Hz)
                         'zscore': bool, # z-score before psd
-                        'stimulus_id': str, # stimulus type
                         'sheet_names': list
                         })
 
     def perform_analysis(self):
 
         # bin spikes
-
+        PSTH(self.datastore,
+            ParameterSet({'bin_length': self.parameters.bin_length})).analyse()
 
         segs = queries.param_filter_query(self.datastore,
                         sheet_name=self.parameters.sheet_names[0]).get_segments()
@@ -958,23 +955,24 @@ class PopulationActivitySpectrum(Analysis):
         print self.parameters.sheet_names
 
         for sheet in self.parameters.sheet_names:
+            dsv = queries.param_filter_query(self.datastore,sheet_name=sheet)
+            for st in [MozaikParametrized.idd(s) for s in dsv.get_stimuli()]:
 
-            hists =  queries.param_filter_query(self.datastore,
-                                      analysis_algorithm='PSTH',
-                                      # y_axis_name='psth (bin={})'.format(self.parameters.bin_length),
-                                      sheet_name=sheet,
-                                      # st_trial=trial,
-                                      ).get_analysis_result()
-            print 'Number of histograms:', len(hists)
+                hists =  queries.param_filter_query(self.datastore,
+                                          analysis_algorithm='PSTH',
+                                          y_axis_name='psth (bin={})'.format(self.parameters.bin_length),
+                                          sheet_name=sheet,
+                                          stimulus_id=str(st),
+                                          ).get_analysis_result()
+                print 'Number of histograms:', len(hists)
+                assert len(hists)==1
+                hist = hists[0]
 
+                spids = queries.param_filter_query(
+                                    self.datastore,
+                                    sheet_name=sheet,
+                                    ).get_segments()[0].get_stored_spike_train_ids()
 
-            spids = queries.param_filter_query(
-                                self.datastore,
-                                sheet_name=sheet,
-                                ).get_segments()[0].get_stored_spike_train_ids()
-
-            psds = []
-            for hist in hists: # for each trial
                 hist_array = hist.get_asl_by_id(spids)
                 spar = []
                 for itm in hist_array:
@@ -992,18 +990,22 @@ class PopulationActivitySpectrum(Analysis):
                         fs=int(1000./self.parameters.bin_length),
                         nperseg=int(1000./(self.parameters.min_freq*self.parameters.bin_length)))
 
-                psds.append(psd)
+                #
+                # ansig = neo.AnalogSignal(psd*qt.dimensionless,
+                #                         times=freqs*qt.Hz,
+                #                         t_start=0*qt.Hz,
+                #                         sampling_rate=(1./self.parameters.min_freq)*qt.s)
 
-            self.datastore.full_datastore.add_analysis_result(
-                        AnalysisDataStructure1D(psds,
-                        # x_axis_units=qt.Hz,
-                        y_axis_units=qt.dimensionless,
-                        x_axis_name='frequency',
-                        y_axis_name='psd (min freq={})'.format(self.parameters.min_freq),
-                        stimulus_id=self.parameters.stimulus_id,
-                        sheet_name=sheet,
-                        analysis_algorithm=self.__class__.__name__,
-                        ))
+
+                self.datastore.full_datastore.add_analysis_result(
+                            AnalysisDataStructure1D(psd,
+                            y_axis_units=qt.dimensionless,
+                            x_axis_name='frequency',
+                            y_axis_name='psd (min freq={})'.format(self.parameters.min_freq),
+                            stimulus_id=str(st),
+                            sheet_name=sheet,
+                            analysis_algorithm=self.__class__.__name__
+                            ))
 
 
 class TemporalBinAverage(Analysis):
