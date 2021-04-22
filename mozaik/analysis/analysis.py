@@ -949,17 +949,19 @@ class PopulationActivitySpectrum(Analysis):
     def perform_analysis(self):
 
         # bin spikes
-        PSTH(self.datastore, ParameterSet({'bin_length': self.parameters.bin_length})).analyse()
+
 
         segs = queries.param_filter_query(self.datastore,
                         sheet_name=self.parameters.sheet_names[0]).get_segments()
         print 'Analyzing {} experiments'. format(len(segs))
 
+        print self.parameters.sheet_names
+
         for sheet in self.parameters.sheet_names:
 
             hists =  queries.param_filter_query(self.datastore,
                                       analysis_algorithm='PSTH',
-                                      y_axis_name='psth (bin={})'.format(self.parameters.bin_length),
+                                      # y_axis_name='psth (bin={})'.format(self.parameters.bin_length),
                                       sheet_name=sheet,
                                       # st_trial=trial,
                                       ).get_analysis_result()
@@ -978,12 +980,12 @@ class PopulationActivitySpectrum(Analysis):
                 for itm in hist_array:
                     spar.append(itm.magnitude)
 
-                spar = np.squeeze(np.array(spar))
+                spar = numpy.squeeze(numpy.array(spar))
 
                 # calculate population-averaged signal
-                popsig = [np.mean(spar, axis=0)]
+                popsig = [numpy.mean(spar, axis=0)]
 
-                if params['zscore']:
+                if self.parameters.zscore:
                     popsig = scipy.stats.zscore(popsig)
 
                 freqs, psd = scipy.signal.welch(popsig,
