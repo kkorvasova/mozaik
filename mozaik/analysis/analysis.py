@@ -951,6 +951,10 @@ class PopulationActivitySpectrum(Analysis):
         # bin spikes
         PSTH(self.datastore, ParameterSet({'bin_length': self.parameters.bin_length})).analyse()
 
+        segs = queries.param_filter_query(self.datastore,
+                        sheet_name=self.parameters.sheet_names[0]).get_segments()
+        print 'Analyzing {} experiments'. format(len(segs))
+
         for sheet in self.parameters.sheet_names:
 
             hists =  queries.param_filter_query(self.datastore,
