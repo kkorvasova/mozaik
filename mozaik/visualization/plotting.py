@@ -874,13 +874,12 @@ class SpectrumPlot(Plotting):
         ys = np.mean(np.array(psds), axis=0)
         xs = np.arnage(0, len(ys), self.parameters.min_freq)
 
-        d.extend([ ("Spectrum_plot",StandardStyleLinePlot(xs, ys), gs.
-                   {
-                               # "mean" : True,
-                               "x_lim" : (0, 150),
-                               "x_label": 'frequency (Hz)',
-                               "y_label": 'PSD')
-                          }),
+        params = {  "x_lim" : (0, 150),
+                    "x_label": 'frequency (Hz)',
+                    "y_label": 'PSD',  # "mean" : True,)
+               }
+
+        d.extend([ ("Spectrum_plot",StandardStyleLinePlot(xs, ys), gs,params),
               ])
         return d
 
