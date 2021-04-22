@@ -952,7 +952,7 @@ class PopulationActivitySpectrum(Analysis):
                                       analysis_algorithm='PSTH',
                                       y_axis_name='psth (bin={})'.format(self.parameters.bin_length),
                                       sheet_name=sheet,
-                                      st_trial=trial,
+                                      # st_trial=trial,
                                       ).get_analysis_result()
             print 'Number of histograms:', len(hists)
 
