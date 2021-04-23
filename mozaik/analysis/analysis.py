@@ -31,8 +31,6 @@ from mozaik.tools.circ_stat import circ_mean, circular_dist
 from mozaik.tools.neo_object_operations import neo_mean, neo_sum, down_sample_analog_signal_average_method
 import mozaik
 
-import neo
-
 logger = mozaik.getMozaikLogger()
 
 class Analysis(ParametrizedObject):
@@ -944,10 +942,6 @@ class PopulationActivitySpectrum(Analysis):
 
     def perform_analysis(self):
 
-        # bin spikes
-        PSTH(self.datastore,
-            ParameterSet({'bin_length': self.parameters.bin_length})).analyse()
-
         segs = queries.param_filter_query(self.datastore,
                         sheet_name=self.parameters.sheet_names[0]).get_segments()
         print 'Analyzing {} experiments'. format(len(segs))
@@ -956,13 +950,13 @@ class PopulationActivitySpectrum(Analysis):
 
         for sheet in self.parameters.sheet_names:
             dsv = queries.param_filter_query(self.datastore,sheet_name=sheet)
-            for st in [MozaikParametrized.idd(s) for s in dsv.get_stimuli()]:
+            for st in dsv.get_stimuli():
 
                 hists =  queries.param_filter_query(self.datastore,
                                           analysis_algorithm='PSTH',
                                           y_axis_name='psth (bin={})'.format(self.parameters.bin_length),
                                           sheet_name=sheet,
-                                          stimulus_id=str(st),
+                                          stimulus_id=st,
                                           ).get_analysis_result()
                 print 'Number of histograms:', len(hists)
                 assert len(hists)==1
@@ -981,7 +975,7 @@ class PopulationActivitySpectrum(Analysis):
                 spar = numpy.squeeze(numpy.array(spar))
 
                 # calculate population-averaged signal
-                popsig = [numpy.mean(spar, axis=0)]
+                popsig = numpy.mean(spar, axis=0)
 
                 if self.parameters.zscore:
                     popsig = scipy.stats.zscore(popsig)
@@ -990,22 +984,32 @@ class PopulationActivitySpectrum(Analysis):
                         fs=int(1000./self.parameters.bin_length),
                         nperseg=int(1000./(self.parameters.min_freq*self.parameters.bin_length)))
 
-                #
-                # ansig = neo.AnalogSignal(psd*qt.dimensionless,
-                #                         times=freqs*qt.Hz,
-                #                         t_start=0*qt.Hz,
-                #                         sampling_rate=(1./self.parameters.min_freq)*qt.s)
 
+                ansig = NeoAnalogSignal(numpy.squeeze(psd)*qt.dimensionless, #
+                                        times=freqs*qt.Hz,
+                                        t_start=0*qt.Hz,
+                                        sampling_rate=(1./self.parameters.min_freq)*qt.s)
 
                 self.datastore.full_datastore.add_analysis_result(
-                            AnalysisDataStructure1D(psd,
+                            AnalogSignal(ansig,
                             y_axis_units=qt.dimensionless,
                             x_axis_name='frequency',
                             y_axis_name='psd (min freq={})'.format(self.parameters.min_freq),
-                            stimulus_id=str(st),
+                            stimulus_id=st,
                             sheet_name=sheet,
                             analysis_algorithm=self.__class__.__name__
                             ))
+
+                #
+                # self.datastore.full_datastore.add_analysis_result(
+                #             AnalysisDataStructure1D(psd,
+                #             y_axis_units=qt.dimensionless,
+                #             x_axis_name='frequency',
+                #             y_axis_name='psd (min freq={})'.format(self.parameters.min_freq),
+                #             stimulus_id=str(st),
+                #             sheet_name=sheet,
+                #             analysis_algorithm=self.__class__.__name__
+                #             ))
 
 
 class TemporalBinAverage(Analysis):

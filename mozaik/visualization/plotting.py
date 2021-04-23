@@ -873,10 +873,13 @@ class SpectrumPlot(Plotting):
                 analysis_algorithm='PopulationActivitySpectrum',
                 y_axis_name='psd (min freq={})'.format(self.parameters.min_freq),
                 sheet_name=self.parameters.sheet_name).get_analysis_result()
-        import ipdb; ipdb.set_trace()
+        asl = [moz_asig.analog_signal for moz_asig in psds]
+        # neo analogsignal needs have the original shape to be saved
+        # as a mozaik analogsignal in analysis
 
-        ys = psds[0] #numpy.mean(numpy.array(psds), axis=0)
-        xs = numpy.arange(0, len(ys), self.parameters.min_freq)
+        ys = numpy.array(asl) # [0] #numpy.mean(numpy.array(psds), axis=0)
+        xs = psds[0].analog_signal.times
+        # import ipdb; ipdb.set_trace()
 
         params = {  "x_lim" : (0, 150),
                     "x_label": 'frequency (Hz)',
